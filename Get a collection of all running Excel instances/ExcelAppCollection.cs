@@ -153,7 +153,12 @@ namespace Get_a_collection_of_all_running_Excel_instances
         private static xlApp InnerFromHandle(Int32 handle) {
             xlWin win = null;
             Int32 hr = AccessibleObjectFromWindow(handle, DW_OBJECTID, rrid.ToByteArray(), ref win);
-            return win.Application;
+
+            if (win != null)
+                return win.Application;
+            else
+                return null;
+            
         }
 
         private static Int32 GetWindowZ(IntPtr handle) {

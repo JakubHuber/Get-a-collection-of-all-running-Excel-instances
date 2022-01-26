@@ -15,11 +15,11 @@ namespace Get_a_collection_of_all_running_Excel_instances
         static void Main()
         {
 
-            Application excel;
+            Application oExcel;
 
             ExcelAppCollection myApps = new ExcelAppCollection();
             Console.WriteLine("Session ID " + myApps.SessionID);
-            excel = myApps.PrimaryInstance;
+            //oExcel = myApps.PrimaryInstance;
             //var oExcels = new List<Process>();
 
             List<Process> oExcels = (List<Process>)myApps.GetProcesses();
@@ -29,15 +29,24 @@ namespace Get_a_collection_of_all_running_Excel_instances
 
             foreach (Process process in oExcels)
             {
-                excel = myApps.FromProcess(process);
+                oExcel = myApps.FromProcess(process);
                 Console.WriteLine("Process ID " + process.Id);
-                Console.WriteLine("Excel Workbooks count " + excel.Workbooks.Count);
-                Console.WriteLine();
-
-                foreach (Workbook workbook in excel.Workbooks)
+                if (oExcel != null)
                 {
-                    Console.WriteLine("Process ID: " + process.Id + " Workbook Name: " + workbook.Name);
+                    Console.WriteLine("Excel Workbooks count " + oExcel.Workbooks.Count);
+                    Console.WriteLine();
+
+                    foreach (Workbook workbook in oExcel.Workbooks)
+                    {
+                        Console.WriteLine("Process ID: " + process.Id + " Workbook Name: " + workbook.Name);
+                    }
                 }
+                else
+                {
+                    Console.WriteLine("Excel is in task manager but not visible - not correctly closed?");
+                }
+                
+                //TODO: dispose correctly excel object
 
                 Console.WriteLine();
 
