@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -15,45 +16,86 @@ namespace Get_a_collection_of_all_running_Excel_instances
         static void Main()
         {
 
-            Application oExcel;
-
             ExcelAppCollection myApps = new ExcelAppCollection();
             Console.WriteLine("Session ID " + myApps.SessionID);
             //oExcel = myApps.PrimaryInstance;
-            //var oExcels = new List<Process>();
+            
+            Console.WriteLine("Getting Excel processes");
+            List<Process> ExcelProcesses = (List<Process>)myApps.GetProcesses();
 
-            List<Process> oExcels = (List<Process>)myApps.GetProcesses();
-
-            Console.WriteLine("Number of Excel processes found: " + oExcels.Count);
+            Console.WriteLine("Number of Excel processes found: {0}", ExcelProcesses.Count);
             Console.WriteLine();
 
-            foreach (Process process in oExcels)
+            Application ExcelAppication;
+
+            foreach (Process process in ExcelProcesses)
             {
-                oExcel = myApps.FromProcess(process);
-                Console.WriteLine("Process ID " + process.Id);
-                if (oExcel != null)
+                Console.WriteLine("Process ID {0}" , process.Id);
+                ExcelAppication = myApps.FromProcess(process);
+                
+                if (ExcelAppication != null)
                 {
-                    Console.WriteLine("Excel Workbooks count " + oExcel.Workbooks.Count);
+                    Console.WriteLine("Excel Workbooks count {0}" , ExcelAppication.Workbooks.Count);
                     Console.WriteLine();
 
-                    foreach (Workbook workbook in oExcel.Workbooks)
+
+                    foreach (Workbook oWorkbook in ExcelAppication.Workbooks)
                     {
-                        Console.WriteLine("Process ID: " + process.Id + " Workbook Name: " + workbook.Name);
+
+                        Console.WriteLine("Closing workbook {0}", oWorkbook.Name);
+                        if (oWorkbook.Saved)
+                        {
+                            oWorkbook.Close(true);
+                        }
+                        else
+                        {
+
+                            Console.WriteLine("Workbook never saved. Saving to {0}", Environment.SpecialFolder.Desktop);
+                            oWorkbook.SaveAs(Path.Combine(Environment.SpecialFolder.Desktop.ToString(), oWorkbook.Name),XlFileFormat.xlWorkbookDefault);
+                            oWorkbook.Close(true);
+
+                        }
+
+                        Console.WriteLine("Releasing workbook object");
+                        ReleaseAll(oWorkbook);
+
                     }
+
+                    Console.WriteLine("Releasing Excel object {0}", process.Id);
+                    ExcelAppication.Quit();
+                    ReleaseAll(ExcelAppication);
+
                 }
                 else
                 {
-                    Console.WriteLine("Excel is in task manager but not visible - not correctly closed?");
+                    Console.WriteLine("Excel is in task manager but not visible. Kill it with fire!");
+                    process.Kill(); 
                 }
-                
-                //TODO: dispose correctly excel object
-
-                Console.WriteLine();
 
             }
-
+        
             Console.ReadLine(); 
-
         }
+
+        static void ReleaseAll(object obj)
+        {
+            try
+            {
+                Marshal.ReleaseComObject(obj);
+                obj = null;
+            }
+            catch
+            {
+                obj = null;
+            }
+            finally
+            {
+                GC.Collect();
+            }
+        }
+
+
+
     }
+
 }
