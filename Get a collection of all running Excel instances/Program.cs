@@ -6,7 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Microsoft.Office.Interop.Excel;
-
+using System.Reflection;
 
 namespace Get_a_collection_of_all_running_Excel_instances
 {
@@ -43,17 +43,17 @@ namespace Get_a_collection_of_all_running_Excel_instances
                     {
 
                         Console.WriteLine("Closing workbook {0}", oWorkbook.Name);
-                        if (oWorkbook.Saved)
+                        if (oWorkbook.Path != string.Empty)
                         {
-                            oWorkbook.Close(true);
+                            oWorkbook.Close(true, Missing.Value, Missing.Value);
                         }
                         else
                         {
 
-                            Console.WriteLine("Workbook never saved. Saving to {0}", Environment.SpecialFolder.Desktop);
-                            oWorkbook.SaveAs(Path.Combine(Environment.SpecialFolder.Desktop.ToString(), oWorkbook.Name),XlFileFormat.xlWorkbookDefault);
-                            oWorkbook.Close(true);
-
+                            string savePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), oWorkbook.Name + ".xlsx");
+                            Console.WriteLine("Workbook first time opened - savied {0}", savePath);
+                            oWorkbook.SaveAs(savePath, XlFileFormat.xlWorkbookNormal, Missing.Value, Missing.Value, Missing.Value, Missing.Value, XlSaveAsAccessMode.xlExclusive, Missing.Value, Missing.Value, Missing.Value, Missing.Value, Missing.Value);
+                            oWorkbook.Close(true, Missing.Value, Missing.Value);
                         }
 
                         Console.WriteLine("Releasing workbook object");
@@ -64,12 +64,14 @@ namespace Get_a_collection_of_all_running_Excel_instances
                     Console.WriteLine("Releasing Excel object {0}", process.Id);
                     ExcelAppication.Quit();
                     ReleaseAll(ExcelAppication);
+                    Console.WriteLine();
 
                 }
                 else
                 {
                     Console.WriteLine("Excel is in task manager but not visible. Kill it with fire!");
-                    process.Kill(); 
+                    process.Kill();
+                    Console.WriteLine();
                 }
 
             }
