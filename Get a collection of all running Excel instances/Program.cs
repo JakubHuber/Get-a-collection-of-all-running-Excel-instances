@@ -42,7 +42,7 @@ namespace Get_a_collection_of_all_running_Excel_instances
                     foreach (Workbook oWorkbook in ExcelAppication.Workbooks)
                     {
 
-                        Console.WriteLine("Closing workbook {0}", oWorkbook.Name);
+                        Console.WriteLine("Saving and closing workbook {0}", oWorkbook.Name);
                         if (oWorkbook.Path != string.Empty)
                         {
                             oWorkbook.Close(true, Missing.Value, Missing.Value);
@@ -52,7 +52,7 @@ namespace Get_a_collection_of_all_running_Excel_instances
 
                             string savePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), oWorkbook.Name + ".xlsx");
                             Console.WriteLine("Workbook first time opened - savied {0}", savePath);
-                            oWorkbook.SaveAs(savePath, XlFileFormat.xlWorkbookNormal, Missing.Value, Missing.Value, Missing.Value, Missing.Value, XlSaveAsAccessMode.xlExclusive, Missing.Value, Missing.Value, Missing.Value, Missing.Value, Missing.Value);
+                            oWorkbook.SaveAs(savePath, XlFileFormat.xlOpenXMLWorkbook, Missing.Value, Missing.Value, Missing.Value, Missing.Value, XlSaveAsAccessMode.xlExclusive, Missing.Value, Missing.Value, Missing.Value, Missing.Value, Missing.Value);
                             oWorkbook.Close(true, Missing.Value, Missing.Value);
                         }
 
