@@ -1,9 +1,12 @@
 ﻿using System;
+using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
+using Microsoft.Office.Interop.Excel;
+using System.Reflection;
 using System.Text;
 
 using xlApp = Microsoft.Office.Interop.Excel.Application;

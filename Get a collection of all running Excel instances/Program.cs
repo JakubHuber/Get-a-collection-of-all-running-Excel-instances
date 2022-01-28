@@ -50,9 +50,16 @@ namespace Get_a_collection_of_all_running_Excel_instances
                         else
                         {
 
-                            string savePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), oWorkbook.Name + ".xlsx");
+                            string folderPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                            string savePath = Path.Combine(folderPath, oWorkbook.Name + ".xlsx");
                             Console.WriteLine("Workbook first time opened - savied {0}", savePath);
-                            oWorkbook.SaveAs(savePath, XlFileFormat.xlOpenXMLWorkbook, Missing.Value, Missing.Value, Missing.Value, Missing.Value, XlSaveAsAccessMode.xlExclusive, Missing.Value, Missing.Value, Missing.Value, Missing.Value, Missing.Value);
+                            
+                            if (File.Exists(savePath))
+                            {
+                                savePath = Path.Combine(folderPath, oWorkbook.Name + DateTime.Now.ToString("ssmmHHddMMyyyy") + ".xlsx");
+                            }
+
+                            oWorkbook.SaveAs(savePath, XlFileFormat.xlOpenXMLWorkbook, Missing.Value, Missing.Value, Missing.Value, Missing.Value, XlSaveAsAccessMode.xlExclusive, XlSaveConflictResolution.xlLocalSessionChanges, Missing.Value, Missing.Value, Missing.Value, Missing.Value);
                             oWorkbook.Close(true, Missing.Value, Missing.Value);
                         }
 
